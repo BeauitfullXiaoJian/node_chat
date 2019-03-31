@@ -1,0 +1,8 @@
+{
+    "from": "1111",
+    "to": "2222",
+    "message": {
+        "type": "text",
+        "content": "你好吗"
+    }
+}

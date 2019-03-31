@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+</head>
+
+<body>
+    <input id="text" type="text" placeholder="请输入要发送的消息">
+    <button id="send_btn">发送消息</button>
+    <!--收到的消息这里可以显示-->
+    <pre id="message"></pre>
+    <script>
+
+        document.getElementById('send_btn').addEventListener('click', function () {
+            const message = document.getElementById('text').value;
+            ws.send(message);
+        });
+
+        const ws = new WebSocket('ws://127.0.0.1:8000?token=537943f64b934ba24735b4ab0d0017dd5d393e56dc01486d9a4ca8c1f2f6c62f24c3166f9b13f779417eff8f5981b00719660a31d38936de0e889168f5793d6b8a2524cde7ebc9011fab07afa5dedd65d6f03089168dfa717d05f45c7b714bfd3a8e1f04c75538e3764859fb607ae573aee5f68e819515ecaf3fc5720a2a99a5', ['x84321dfds']);
+
+        /**
+         * 收到消息
+         */
+        ws.onmessage = (res) => {
+            console.log(res);
+            document.getElementById('message').innerHTML += res.data + '\n';
+        };
+
+        /**
+         * 连接关闭
+         */
+        ws.onclose = (reson) => {
+
+        };
+    </script>
+
+</body>
+
+</html>
