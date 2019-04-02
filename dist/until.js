@@ -35,7 +35,9 @@ exports.Until = {
             const decodeData = crypto_1.default.privateDecrypt(privateKey, Buffer.from(uidToken, 'hex')).toString();
             const now = new Date().getTime();
             let obj = JSON.parse(decodeData) || {};
-            obj = Object.assign({ uid: 0, timestamp: 0 }, obj);
+            obj = Object.assign({ uid: 0, timeStamp: 0 }, obj);
+            console.log(obj.uid, uid, now, obj.timeStamp);
+            console.log(obj.uid === uid && (now - obj.timeStamp) < 5 * 60 * 1000);
             // 5分钟内有效
             return obj.uid === uid && (now - obj.timeStamp) < 5 * 60 * 1000;
         }

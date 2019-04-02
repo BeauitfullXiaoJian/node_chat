@@ -40,7 +40,7 @@ export class WSServer {
             res.header('Access-Control-Allow-Origin', '*');
             res.header('Access-Control-Allow-Headers', 'Content-Type, Content-Length, Authorization, Accept, X-Requested-With, ng-params-one, ng-params-two, ng-params-three');
             res.header('Access-Control-Allow-Methods', 'PUT, POST, GET, DELETE, OPTIONS');
-            req.method == 'OPTIONS' ? res.send(200) : next();
+            req.method == 'OPTIONS' ? res.sendStatus(200) : next();
         });
         this.app.use(express.static(__dirname + '/../../public'));
         this.connencts = [];
@@ -117,35 +117,36 @@ export class WSServer {
     initWs() {
         const server = expressWs(this.app, this.http);
         this.ws = server.getWss();
-        (<any>this.app)['ws']('/', (ws: any, req: any) => {
-            this.ws.on('connection', (socket) => {
-                // 当前连接客户端
-                const userClient = { uid: socket.protocol, client: socket, token: req.query && req.query.token };
+        (<any>this.app)['ws']('/', (ws: any, req: any) => { });
+        this.ws.on('connection', (socket, req: any) => {
+            // 当前连接客户端
+            const userClient = { uid: socket.protocol, client: socket, token: req.query && req.query.token };
 
-                // 连接校验
-                if (this.linkCheck(userClient) === false) {
-                    return;
-                }
+            // 连接校验
+            if (this.linkCheck(userClient) === false) {
+                socket.close();
+                return;
+            }
 
-                // 把之前没有发出的消息发送回去
-                this.sendSaveMessage(userClient);
+            // 把之前没有发出的消息发送回去
+            this.sendSaveMessage(userClient);
 
-                // 关掉之前的连接
-                this.connencts.filter(con => con.uid === userClient.uid)
-                    .forEach(con => {
-                        con.client && con.client.close();
-                    });
-
-                // 加入新连接
-                this.connencts.push(userClient);
-
-                // 在客户端关闭的时候清理
-                userClient.client.on('close', () => {
-                    const i = this.connencts.indexOf(userClient);
-                    this.connencts.splice(i, 1);
-                    // 从队列中清除垃圾连接
-                    this.connencts = this.connencts.filter(con => con.uid !== userClient.uid && con.client.readyState === true);
+            // 关掉之前的连接
+            this.connencts.filter(con => con.uid === userClient.uid)
+                .forEach(con => {
+                    con.client && con.client.close();
                 });
+
+            // 加入新连接
+            this.connencts.push(userClient);
+
+            // 在客户端关闭的时候清理
+            userClient.client.on('close', () => {
+                console.log('我被别人关闭了')
+                const i = this.connencts.indexOf(userClient);
+                this.connencts.splice(i, 1);
+                // 从队列中清除垃圾连接
+                this.connencts = this.connencts.filter(con => con.uid !== userClient.uid && con.client.readyState === true);
             });
         });
     }
@@ -208,7 +209,7 @@ export class WSServer {
             stream.on('open', () => {
                 const reader = readline.createInterface({ input: stream });
                 reader.on('line', str => {
-                    userClient.client.send(str);
+                    userClient.client.readyState === 1 && userClient.client.send(str);
                 });
                 reader.on('close', () => {
                     fs.unlink(path, () => { });

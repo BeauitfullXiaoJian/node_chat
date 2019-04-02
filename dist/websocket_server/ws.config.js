@@ -4,7 +4,7 @@ exports.config = {
     server: {
         name: '1号服务器',
         host: 'http://127.0.0.1:8000',
-        wsHost: 'ws://127.0.0.1:8000',
+        wsHost: 'ws://192.168.1.109:8000',
         port: 8000,
         connects: 100,
         logPath: `${__dirname}/../../log.text`,

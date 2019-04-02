@@ -33,7 +33,7 @@ export class ApiServer {
             res.header('Access-Control-Allow-Origin', '*');
             res.header('Access-Control-Allow-Headers', 'Content-Type, Content-Length, Authorization, Accept, X-Requested-With, ng-params-one, ng-params-two, ng-params-three');
             res.header('Access-Control-Allow-Methods', 'PUT, POST, GET, DELETE, OPTIONS');
-            req.method == 'OPTIONS' ? res.send(200) : next();
+            req.method == 'OPTIONS' ? res.sendStatus(200) : next();
         });
         this.app.use(express.static(__dirname + '/../../public'));
         this.wsServices = [];
@@ -78,7 +78,7 @@ export class ApiServer {
 
         // 获取一个可用的websocket连接
         this.app.get('/request', (req, res) => {
-            this.getWsLink(0, 'x84321dfds', (data) => {
+            this.getWsLink(0, req.query.uid, (data) => {
                 return res.status(200).json(data);
             });
         });
